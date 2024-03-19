@@ -27,7 +27,7 @@ The developed model aims to enhance agricultural practices by providing an autom
 
 This is an example of how to list things you need to use the software and how to install them.
 * MATLAB:
-  Install MATLAB from the MathWorks website if you haven't already.
+  **Install MATLAB from the MathWorks website if you haven't already.
   Download MATLAB from MathWorks website.
   Follow the installation instructions for your operating system.
 * Deep Learning Toolbox:
@@ -39,7 +39,7 @@ This is an example of how to list things you need to use the software and how to
   If you don't see "Deep Learning Toolbox" in the list, you'll need to install it.
 * Installing Toolboxes:
   
-From MATLAB App Store:
+  From MATLAB App Store:
 MATLAB provides an App Store-like interface for installing add-ons.
 Open MATLAB and go to the "APPS" tab.
 Click on "Get More Apps" to open the MATLAB Add-Ons Browser.
