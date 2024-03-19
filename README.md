@@ -26,11 +26,11 @@ The developed model aims to enhance agricultural practices by providing an autom
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* MATLAB
+* MATLAB:
   Install MATLAB from the MathWorks website if you haven't already.
   Download MATLAB from MathWorks website.
   Follow the installation instructions for your operating system.
-* Deep Learning Toolbox
+* Deep Learning Toolbox:
   This toolbox is required for training and working with deep learning models.
   In MATLAB, you can check if you have the Deep Learning Toolbox by running:
   ```sh
