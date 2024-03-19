@@ -27,9 +27,10 @@ The developed model aims to enhance agricultural practices by providing an autom
 
 This is an example of how to list things you need to use the software and how to install them.
 * MATLAB:
-  **Install MATLAB from the MathWorks website if you haven't already.
+  Install MATLAB from the MathWorks website if you haven't already.
   Download MATLAB from MathWorks website.
   Follow the installation instructions for your operating system.
+  
 * Deep Learning Toolbox:
   This toolbox is required for training and working with deep learning models.
   In MATLAB, you can check if you have the Deep Learning Toolbox by running:
@@ -37,31 +38,27 @@ This is an example of how to list things you need to use the software and how to
   ver
   ```
   If you don't see "Deep Learning Toolbox" in the list, you'll need to install it.
-* Installing Toolboxes:
   
-  From MATLAB App Store:
-MATLAB provides an App Store-like interface for installing add-ons.
-Open MATLAB and go to the "APPS" tab.
-Click on "Get More Apps" to open the MATLAB Add-Ons Browser.
-Search for "Deep Learning Toolbox" and "Image Processing Toolbox".
-Click "Install" for each to add them to your MATLAB installation.
+* Installing Toolboxes:
+  MATLAB provides an App Store-like interface for installing add-ons.
+  Open MATLAB and go to the "APPS" tab.
+  Click on "Get More Apps" to open the MATLAB Add-Ons Browser.
+  Search for "Deep Learning Toolbox" and "Image Processing Toolbox".
+  Click "Install" for each to add them to your MATLAB installation. 
 
-
-Using Add-Ons Manager:
-Alternatively, you can use the Add-Ons Manager to install the toolboxes.
-In MATLAB, go to the "HOME" tab.
-Under "Environment", click on "Add-Ons".
-Click on "Get Add-Ons" to open the Add-Ons Explorer.
-Search for "Deep Learning Toolbox" and "Image Processing Toolbox".
-Click "Install" for each to install them.
+  Alternatively, you can use the Add-Ons Manager to install the toolboxes.
+  In MATLAB, go to the "HOME" tab.
+  Under "Environment", click on "Add-Ons".
+  Click on "Get Add-Ons" to open the Add-Ons Explorer.
+  Search for "Deep Learning Toolbox" and "Image Processing Toolbox".
+  Click "Install" for each to install them.
 
 ### Usage
-
 
 1. Clone the repo
    
    ```sh
-   git clone https://github.com/your-username/plant-disease-detection.git
+   git clone https://github.com/Apep-sys/plant-disease-detection.git
    ```
 2. Open MATLAB and navigate to the cloned directory:
    
