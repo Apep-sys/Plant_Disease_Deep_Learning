@@ -136,11 +136,17 @@ classdef App < matlab.apps.AppBase
                 return;
             end
             
+            % Now check if CurrentDiseaseEnglish has a valid value
+            if isempty(app.CurrentDiseaseEnglish) || (~ischar(app.CurrentDiseaseEnglish) && ~isstring(app.CurrentDiseaseEnglish))
+                % If there's no disease detected yet or the format is incorrect, exit the function
+                return;
+            end
+
             % Update the Tool Tip message based on the current language setting
             if language == "ENG"
-                app.TipLabel.Text = 'Friendly Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a table, in normal conditions of visibility. Then, take a picture.';
+                app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a table, in normal conditions of visibility. Then, take a picture.';
             elseif language == "RO"
-                app.TipLabel.Text = 'Sfat prietenos: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o masă, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
+                app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o masă, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
             end
         end
 
@@ -197,22 +203,21 @@ classdef App < matlab.apps.AppBase
                 imgHeight = size(resizedImage, 1);
                 app.InsertedImage.Position = [(app.DiseaseDetectionUIFigure.Position(3) - imgWidth) / 2, (app.DiseaseDetectionUIFigure.Position(4) - imgHeight) / 2 + 170, imgWidth, imgHeight]; % Adjust position and size of the inserted image to account for the border
         
-                % Update the text with the predicted plant label
+                % Update the text with the predicted plant label and the
+                % tool tip
                 app.PredictedPlantLabel = uilabel(app.DiseaseDetectionUIFigure);
                 app.PredictedPlantLabel.Position = [app.InsertedImage.Position(1) + 30, app.InsertedImage.Position(2) - 30, 400, 22]; % Adjust position of the label
                 if max(scores1) >= confidenceThreshold 
                     app.CurrentDiseaseEnglish = char(predictedLabel1);
                     updateDiseaseLabelLanguage(app, app.LanguageSwitch.Value);
+
+                    app.TipLabel = uilabel(app.DiseaseDetectionUIFigure);
+                    app.TipLabel.Position = [30, app.InsertedImage.Position(2) - 100, 800, 50];
+                    updateToolTipLanguage(app, app.LanguageSwitch.Value);
                 else
                     app.CurrentDiseaseEnglish = 'No disease detected';
                     updateDiseaseLabelLanguage(app, app.LanguageSwitch.Value);
                 end
-
-                % Show the Tool Tip
-                app.TipLabel = uilabel(app.DiseaseDetectionUIFigure);
-                
-                app.TipLabel.Position = [30, app.InsertedImage.Position(2) - 100, 400, 22];
-                updateToolTipLanguage(app, app.LanguageSwitch.Value);
         
                 % Make the Disease Details Button visible after picture is classified
                 app.DiseaseDetailsButton.Visible = 'on';
@@ -235,12 +240,14 @@ classdef App < matlab.apps.AppBase
                 app.DiseaseDetailsButton.Text = 'Disease Details';
                 app.TreatmentOptionsButton.Text = 'Treatment Options';
                 app.updateDiseaseLabelLanguage('ENG');
+                app.updateToolTipLanguage('ENG');
             elseif strcmp(selectedLanguage, 'RO')
                 app.TextArea.Value = {'  Alegeți imaginea necesară pentru inspecție'};
                 app.InsertPictureButton.Text = 'Inserați imaginea';
                 app.DiseaseDetailsButton.Text = 'Detalii Boală';
                 app.TreatmentOptionsButton.Text = 'Opțiuni de Tratament';
                 app.updateDiseaseLabelLanguage('RO');
+                app.updateToolTipLanguage('RO');
             end
 
             % Update the LanguageSwitch component text
@@ -445,7 +452,7 @@ classdef App < matlab.apps.AppBase
         end
  
         function TreatmentOptions(app)
-        if ~isempty(app.CurrentDiseaseEnglish)
+            if ~isempty(app.CurrentDiseaseEnglish)
                 % Get the details for the current disease
                 disease = app.CurrentDiseaseEnglish; % Assuming this is the disease name
                 treatment = app.getTreatmentOptions(disease);
@@ -455,9 +462,9 @@ classdef App < matlab.apps.AppBase
 
                 % Display the details in a message box based on the selected language
                 if strcmp(selectedLanguage, 'ENG')
-                    message = strrep(treatment.English, '\n\t', newline + "    ");
+                    message = strrep(treatment, '\n\t', newline + "    ");
                 elseif strcmp(selectedLanguage, 'RO')
-                    message = strrep(treatment.Romanian, '\n\t', newline + "    ");
+                    message = strrep(treatment, '\n\t', newline + "    ");
                 else
                     message = 'Language not supported.';
                 end
@@ -721,12 +728,8 @@ classdef App < matlab.apps.AppBase
             end
         end
     end
-            %options = strrep(options, '\n', newline);
-            %options = strrep(options, '\t', sprintf('\t'));
-        
-        %end
-    %end
 
+    
     % App creation and deletion
     methods (Access = public)
 
