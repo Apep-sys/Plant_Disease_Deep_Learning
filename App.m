@@ -130,23 +130,25 @@ classdef App < matlab.apps.AppBase
 
 
         function updateToolTipLanguage(app, language)
-            % Check if the TipLabel object exists and is valid
+    % Check if the TipLabel object exists and is valid
             if isempty(app.TipLabel) || ~isvalid(app.TipLabel)
-                % If the label does not exist or is not valid, exit the function
+        % If the label does not exist or is not valid, exit the function
                 return;
             end
-            
-            % Now check if CurrentDiseaseEnglish has a valid value
+    
+    % Now check if CurrentDiseaseEnglish has a valid value
             if isempty(app.CurrentDiseaseEnglish) || (~ischar(app.CurrentDiseaseEnglish) && ~isstring(app.CurrentDiseaseEnglish))
-                % If there's no disease detected yet or the format is incorrect, exit the function
+        % If there's no disease detected yet or the format is incorrect, exit the function
                 return;
             end
 
-            % Update the Tool Tip message based on the current language setting
-            if language == "ENG"
-                app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a table, in normal conditions of visibility. Then, take a picture.';
-            elseif language == "RO"
-                app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o masă, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
+    % Only update the Tool Tip message if there is a valid disease detected
+            if ~isempty(app.CurrentDiseaseEnglish)
+                if language == "ENG"
+                    app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a table, in normal conditions of visibility. Then, take a picture.';
+                elseif language == "RO"
+                     app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o masă, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
+                end
             end
         end
 
@@ -240,14 +242,20 @@ classdef App < matlab.apps.AppBase
                 app.DiseaseDetailsButton.Text = 'Disease Details';
                 app.TreatmentOptionsButton.Text = 'Treatment Options';
                 app.updateDiseaseLabelLanguage('ENG');
-                app.updateToolTipLanguage('ENG');
+
+                if selectedLanguage && ~isempty(app.CurrentDiseaseEnglish)
+                    app.updateToolTipLanguage('ENG');
+                end
             elseif strcmp(selectedLanguage, 'RO')
                 app.TextArea.Value = {'  Alegeți imaginea necesară pentru inspecție'};
                 app.InsertPictureButton.Text = 'Inserați imaginea';
                 app.DiseaseDetailsButton.Text = 'Detalii Boală';
                 app.TreatmentOptionsButton.Text = 'Opțiuni de Tratament';
                 app.updateDiseaseLabelLanguage('RO');
-                app.updateToolTipLanguage('RO');
+                
+                if selectedLanguage && ~isempty(app.CurrentDiseaseEnglish)
+                    app.updateToolTipLanguage('RO');
+                end
             end
 
             % Update the LanguageSwitch component text
@@ -442,15 +450,9 @@ classdef App < matlab.apps.AppBase
             if isKey(diseaseDetails, disease)
                 details = diseaseDetails(disease);
             end
-            %if isstruct(details)
-                %details = struct2cell(details);
-                %details = strjoin(details,' ');
-            %end
-            %details = strrep(details, '\n', newline);
-            %details = strrep(details, '\t', sprintf('\t'));
-            
         end
  
+
         function TreatmentOptions(app)
             if ~isempty(app.CurrentDiseaseEnglish)
                 % Get the details for the current disease
@@ -729,7 +731,7 @@ classdef App < matlab.apps.AppBase
         end
     end
 
-    
+
     % App creation and deletion
     methods (Access = public)
 
@@ -742,7 +744,7 @@ classdef App < matlab.apps.AppBase
             
             % Mapam bolile
             englishNames = {'Pepper__bell___Bacterial_spot','Pepper__bell___healthy','Potato___Early_blight','Potato___healthy','Potato___Late_blight','Tomato_Early_blight','Tomato_Late_blight','Tomato_Leaf_Mold','Tomato_Septoria_leaf_spot','Tomato_Spider_mites_Two_spotted_spider_mite','Tomato__Target_Spot','Tomato__Tomato_mosaic_virus','Tomato__Tomato_YellowLeaf__Curl_Virus','Tomato_Bacterial_spot','Tomato_healthy'};
-            romanianNames = {'Patarea frunzelor si basicarea fructelor de ardei','Ardei gras sanatos','Alternarioza la cartof','Cartof sanatos','Ciuperca Cartofului','Alternarioza tomatelor','Mana tomatelor','Patarea cafenie a frunzelor de tomate','Septorioza tomatelor','Paianjenul rosu comun','Pătarea brună a frunzelor de tomate','Mozaicul tomatelor','Virusul ingalbenirii si rasucirii frunzelor de tomate','Pătarea frunzelor și bășicarea fructelor tomatelor','Tomate sanatoase'};
+            romanianNames = {'Pătarea frunzelor și bășicarea fructelor de ardei','Ardei gras sanatos','Alternarioza la cartof','Cartof sănătos','Ciuperca Cartofului','Alternarioza tomatelor','Mana tomatelor','Pătarea cafenie a frunzelor de tomate','Septorioza tomatelor','Paianjenul roșu comun','Pătarea brună a frunzelor de tomate','Mozaicul tomatelor','Virusul îngălbenirii și răsucirii frunzelor de tomate','Pătarea frunzelor și bășicarea fructelor tomatelor','Tomate sănătoase'};
             app.DiseaseNameMapping = containers.Map(englishNames, romanianNames);
         end
 
