@@ -136,11 +136,6 @@ classdef App < matlab.apps.AppBase
                 return;
             end
     
-    % Now check if CurrentDiseaseEnglish has a valid value
-            if isempty(app.CurrentDiseaseEnglish) || (~ischar(app.CurrentDiseaseEnglish) && ~isstring(app.CurrentDiseaseEnglish))
-        % If there's no disease detected yet or the format is incorrect, exit the function
-                return;
-            end
 
     % Only update the Tool Tip message if there is a valid disease detected
             if ~isempty(app.CurrentDiseaseEnglish)
@@ -227,10 +222,11 @@ classdef App < matlab.apps.AppBase
         
                 % Hide unnecessary components
                 app.TextArea.Visible = 'off';
+                app.InsertPictureButton.Visible = 'off';
             end
         end
-
-
+        
+        
         function switchLanguage(app, src, ~)
             % Get the current value of the switch button
             selectedLanguage = src.Value;
@@ -243,8 +239,12 @@ classdef App < matlab.apps.AppBase
                 app.TreatmentOptionsButton.Text = 'Treatment Options';
                 app.updateDiseaseLabelLanguage('ENG');
 
-                if selectedLanguage && ~isempty(app.CurrentDiseaseEnglish)
+                if ~isempty(app.CurrentDiseaseEnglish)
                     app.updateToolTipLanguage('ENG');
+                
+                else
+                    app.TipLabel.Text = '';
+
                 end
             elseif strcmp(selectedLanguage, 'RO')
                 app.TextArea.Value = {'  Alegeți imaginea necesară pentru inspecție'};
@@ -252,9 +252,13 @@ classdef App < matlab.apps.AppBase
                 app.DiseaseDetailsButton.Text = 'Detalii Boală';
                 app.TreatmentOptionsButton.Text = 'Opțiuni de Tratament';
                 app.updateDiseaseLabelLanguage('RO');
-                
-                if selectedLanguage && ~isempty(app.CurrentDiseaseEnglish)
+
+                if ~isempty(app.CurrentDiseaseEnglish)
                     app.updateToolTipLanguage('RO');
+
+                else
+                    app.TipLabel.Text = '';
+
                 end
             end
 
