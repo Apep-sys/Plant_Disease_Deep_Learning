@@ -78,14 +78,14 @@ classdef App < matlab.apps.AppBase
 
         % Create TreatmentOptions Button
         app.TreatmentOptionsButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-        app.TreatmentOptionsButton.Position = [320, 100, 160, 35];
+        app.TreatmentOptionsButton.Position = [320, 150, 160, 35];
         app.TreatmentOptionsButton.Text = 'Treatment Options';
         app.TreatmentOptionsButton.ButtonPushedFcn = @(src, event) TreatmentOptions(app);
         app.TreatmentOptionsButton.Visible = 'off'; % Set the button to be visible
         
         % Create Contact Button
         app.ContactButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-        app.ContactButton.Position = [320, 150, 160, 35];
+        app.ContactButton.Position = [320, 100, 160, 35];
         app.ContactButton.Text = 'Contact Information';
         app.ContactButton.ButtonPushedFcn = @(src, event) ContactInfo(app);
         app.ContactButton.Visible = 'off';
@@ -282,8 +282,16 @@ classdef App < matlab.apps.AppBase
     
         function ContactInfo(app)
             contactInfo = struct(...
-                'English', ["Website: www.example.com", "Email: contact@example.com", "Phone: +1234567890"], ...
-                'Romanian', ["Website: www.example.ro", "Email: contact@example.ro", "Telefon: +40123456789"]...
+                'English', ["To contact the local authority or a relevant institution, please access the following: ", ...
+                "   ", ...
+                "➡️Website: https://www.anfdf.ro/", ...
+                "➡️Email: fitosanitar@anfdf.ro / lccf@lccf.ro", ...
+                "➡️Phone:  0212703254 / 0212703256"], ...
+                'Romanian', ["Pentru a contacta autoritatea locală sau o instituție relevantă, vă rugam accesați următoarele: ", ...
+                "   ", ...
+                "➡️Website: https://www.anfdf.ro/", ...
+                "➡️Email: fitosanitar@anfdf.ro / lccf@lccf.ro", ...
+                "➡️Telefon: 0212703254 / 0212703256"]...
             );
 
             selectedLanguage = app.LanguageSwitch.Value;
@@ -293,9 +301,12 @@ classdef App < matlab.apps.AppBase
             elseif strcmp(selectedLanguage, 'RO')
                 message = strrep(contactInfo.Romanian, '\n\t', newline + "   ");
             end
-
-            uialert(app.DiseaseDetectionUIFigure, message, 'Contact Information', 'Icon', 'info');
-
+            
+            if strcmp(selectedLanguage, 'ENG')
+                uialert(app.DiseaseDetectionUIFigure, message, 'Contact Information', 'Icon', 'info');
+            elseif strcmp(selectedLanguage, 'RO')
+                uialert(app.DiseaseDetectionUIFigure, message, 'Informații de Contact', 'Icon', 'info');
+            end
 
         end
         function DiseaseDetails(app)
