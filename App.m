@@ -13,6 +13,7 @@ classdef App < matlab.apps.AppBase
         TipLabel                  matlab.ui.control.Label
         DiseaseDetailsButton      matlab.ui.control.Button
         TreatmentOptionsButton    matlab.ui.control.Button
+        ContactButton             matlab.ui.control.Button
         DiseaseNameMapping        containers.Map
         CurrentDiseaseEnglish     string
     end
@@ -81,6 +82,13 @@ classdef App < matlab.apps.AppBase
         app.TreatmentOptionsButton.Text = 'Treatment Options';
         app.TreatmentOptionsButton.ButtonPushedFcn = @(src, event) TreatmentOptions(app);
         app.TreatmentOptionsButton.Visible = 'off'; % Set the button to be visible
+        
+        % Create Contact Button
+        app.ContactButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+        app.ContactButton.Position = [320, 150, 160, 35];
+        app.ContactButton.Text = 'Contact Information';
+        app.ContactButton.ButtonPushedFcn = @(src, event) ContactInfo(app);
+        app.ContactButton.Visible = 'off';
 
         % Show the figure after all components are created
         app.DiseaseDetectionUIFigure.Visible = 'on';
@@ -135,8 +143,6 @@ classdef App < matlab.apps.AppBase
         % If the label does not exist or is not valid, exit the functiontable
                 return;
             end
-    
-
     % Only update the Tool Tip message if there is a valid disease detected
             if ~isempty(app.CurrentDiseaseEnglish)
                 if language == "ENG"
@@ -221,6 +227,7 @@ classdef App < matlab.apps.AppBase
                 % Make the Disease Details Button visible after picture is classified
                 app.DiseaseDetailsButton.Visible = 'on';
                 app.TreatmentOptionsButton.Visible = 'on';
+                app.ContactButton.Visible = 'on';
         
                 % Hide unnecessary components
                 app.TextArea.Visible = 'off';
@@ -239,6 +246,7 @@ classdef App < matlab.apps.AppBase
                 app.InsertPictureButton.Text = 'Insert Picture';
                 app.DiseaseDetailsButton.Text = 'Disease Details';
                 app.TreatmentOptionsButton.Text = 'Treatment Options';
+                app.ContactButton.Text = 'Contact Information';
                 app.updateDiseaseLabelLanguage('ENG');
 
                 if isempty(app.CurrentDiseaseEnglish) || strcmp(app.CurrentDiseaseEnglish, 'No disease detected.')
@@ -254,6 +262,7 @@ classdef App < matlab.apps.AppBase
                 app.InsertPictureButton.Text = 'Inserați imaginea';
                 app.DiseaseDetailsButton.Text = 'Detalii Boală';
                 app.TreatmentOptionsButton.Text = 'Opțiuni de Tratament';
+                app.ContactButton.Text = 'Informații de Contact';
                 app.updateDiseaseLabelLanguage('RO');
 
                 if isempty(app.CurrentDiseaseEnglish) || strcmp(app.CurrentDiseaseEnglish, 'No disease detected.')
@@ -271,7 +280,24 @@ classdef App < matlab.apps.AppBase
         end
     
     
+        function ContactInfo(app)
+            contactInfo = struct(...
+                'English', ["Website: www.example.com", "Email: contact@example.com", "Phone: +1234567890"], ...
+                'Romanian', ["Website: www.example.ro", "Email: contact@example.ro", "Telefon: +40123456789"]...
+            );
 
+            selectedLanguage = app.LanguageSwitch.Value;
+
+            if strcmp(selectedLanguage, 'ENG')
+                message = strrep(contactInfo.English, '\n\t', newline + "   ");
+            elseif strcmp(selectedLanguage, 'RO')
+                message = strrep(contactInfo.Romanian, '\n\t', newline + "   ");
+            end
+
+            uialert(app.DiseaseDetectionUIFigure, message, 'Contact Information', 'Icon', 'info');
+
+
+        end
         function DiseaseDetails(app)
             % Check if there is a currently detected disease
             if ~isempty(app.CurrentDiseaseEnglish)
