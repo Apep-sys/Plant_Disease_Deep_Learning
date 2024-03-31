@@ -329,10 +329,10 @@ classdef App < matlab.apps.AppBase
                 end
 
                 % Display the details in a message box
-                uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'info');
+                uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'success');
             else
                 % If no disease is detected, show a message
-                uialert(app.DiseaseDetectionUIFigure, 'No disease detected.', 'No Disease', 'Icon', 'info');
+                uialert(app.DiseaseDetectionUIFigure, 'No disease detected.', 'No Disease', 'Icon', 'success');
             end
         end
 
@@ -520,10 +520,10 @@ classdef App < matlab.apps.AppBase
                 end
 
                 % Display the details in a message box
-                uialert(app.DiseaseDetectionUIFigure, message, 'Treatment Options', 'Icon', 'info');
+                uialert(app.DiseaseDetectionUIFigure, message, 'Treatment Options', 'Icon', 'success');
             else
                 % If no disease is detected, show a message
-                uialert(app.DiseaseDetectionUIFigure, 'No disease detected.', 'No Disease', 'Icon', 'info');
+                uialert(app.DiseaseDetectionUIFigure, 'No disease detected.', 'No Disease', 'Icon', 'success');
             end
         end
 
