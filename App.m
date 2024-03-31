@@ -444,7 +444,7 @@ classdef App < matlab.apps.AppBase
             diseaseDetails_En = containers.Map(keys, values_En);
             diseaseDetails_Ro = containers.Map(keys, values_Ro);
             
-            details = struct('English', 'Details not available.', 'Romanian', 'Detalii indisponibile.');
+            defaultDetails = struct('English', 'Details not available.', 'Romanian', 'Detalii indisponibile.');
             selectedLanguage = app.LanguageSwitch.Value;
             % Display the details in a message box based on the selected language
             if strcmp(selectedLanguage, 'ENG')
@@ -452,11 +452,14 @@ classdef App < matlab.apps.AppBase
             elseif strcmp(selectedLanguage, 'RO')
                 diseaseDetails = diseaseDetails_Ro;
             else
+                details = defaultDetails;
                 return;
             end
             % Check if the disease name exists in the map
             if isKey(diseaseDetails, disease)
                 details = diseaseDetails(disease);
+            else
+                details = defaultDetails;
             end
         end
  
@@ -719,7 +722,7 @@ classdef App < matlab.apps.AppBase
             treatmentOptions_En = containers.Map(keys_Treatment, values_En_Treatment);
             treatmentOptions_Ro = containers.Map(keys_Treatment, values_Ro_Treatment);
             
-            treatment = struct('English', 'Treatment not available.', 'Romanian', 'Tratament indisponibil.');
+            defaultTreatment = struct('English', 'Treatment not available.', 'Romanian', 'Tratament indisponibil.');
             selectedLanguage = app.LanguageSwitch.Value;
             % Display the details in a message box based on the selected language
             if strcmp(selectedLanguage, 'ENG')
@@ -727,6 +730,7 @@ classdef App < matlab.apps.AppBase
             elseif strcmp(selectedLanguage, 'RO')
                 treatmentOptions = treatmentOptions_Ro;
             else
+                treatment = defaultTreatment;
                 return;
             end
 
@@ -735,7 +739,7 @@ classdef App < matlab.apps.AppBase
             if isKey(treatmentOptions, disease)
                 treatment = treatmentOptions(disease);
             else
-                treatment = struct('English', 'No treatment options available.', 'Romanian', 'Tratament indisponibil.');
+                treatment = defaultTreatment;
             end
         end
     end
