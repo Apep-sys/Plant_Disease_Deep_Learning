@@ -132,7 +132,7 @@ classdef App < matlab.apps.AppBase
         function updateToolTipLanguage(app, language)
     % Check if the TipLabel object exists and is valid
             if isempty(app.TipLabel) || ~isvalid(app.TipLabel)
-        % If the label does not exist or is not valid, exit the function
+        % If the label does not exist or is not valid, exit the functiontable
                 return;
             end
     
@@ -140,9 +140,9 @@ classdef App < matlab.apps.AppBase
     % Only update the Tool Tip message if there is a valid disease detected
             if ~isempty(app.CurrentDiseaseEnglish)
                 if language == "ENG"
-                    app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a table, in normal conditions of visibility. Then, take a picture.';
+                    app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a surface, in normal conditions of visibility. Then, take a picture.';
                 elseif language == "RO"
-                     app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o masă, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
+                     app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o suprafa, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
                 end
             end
         end
@@ -212,10 +212,12 @@ classdef App < matlab.apps.AppBase
                     app.TipLabel.Position = [30, app.InsertedImage.Position(2) - 100, 800, 50];
                     updateToolTipLanguage(app, app.LanguageSwitch.Value);
                 else
-                    app.CurrentDiseaseEnglish = 'No disease detected';
+                    app.CurrentDiseaseEnglish = 'No disease detected.';
                     updateDiseaseLabelLanguage(app, app.LanguageSwitch.Value);
+                    app.TipLabel.Text = '';
+
                 end
-        
+
                 % Make the Disease Details Button visible after picture is classified
                 app.DiseaseDetailsButton.Visible = 'on';
                 app.TreatmentOptionsButton.Visible = 'on';
@@ -239,13 +241,14 @@ classdef App < matlab.apps.AppBase
                 app.TreatmentOptionsButton.Text = 'Treatment Options';
                 app.updateDiseaseLabelLanguage('ENG');
 
-                if ~isempty(app.CurrentDiseaseEnglish)
-                    app.updateToolTipLanguage('ENG');
-                
-                else
+                if isempty(app.CurrentDiseaseEnglish) || strcmp(app.CurrentDiseaseEnglish, 'No disease detected.')
+                % If no disease is detected or the message is 'No disease detected.', clear the tooltip
                     app.TipLabel.Text = '';
-
+                else
+                % Update and display the tooltip
+                    app.updateToolTipLanguage('ENG');
                 end
+
             elseif strcmp(selectedLanguage, 'RO')
                 app.TextArea.Value = {'  Alegeți imaginea necesară pentru inspecție'};
                 app.InsertPictureButton.Text = 'Inserați imaginea';
@@ -253,13 +256,14 @@ classdef App < matlab.apps.AppBase
                 app.TreatmentOptionsButton.Text = 'Opțiuni de Tratament';
                 app.updateDiseaseLabelLanguage('RO');
 
-                if ~isempty(app.CurrentDiseaseEnglish)
-                    app.updateToolTipLanguage('RO');
-
-                else
+                if isempty(app.CurrentDiseaseEnglish) || strcmp(app.CurrentDiseaseEnglish, 'No disease detected.')
+                    % If no disease is detected or the message is 'No disease detected.', clear the tooltip
                     app.TipLabel.Text = '';
-
+                else
+                    % Update and display the tooltip
+                    app.updateToolTipLanguage('RO');
                 end
+
             end
 
             % Update the LanguageSwitch component text
@@ -468,9 +472,9 @@ classdef App < matlab.apps.AppBase
 
                 % Display the details in a message box based on the selected language
                 if strcmp(selectedLanguage, 'ENG')
-                    message = strrep(treatment, '\n\t', newline + "    ");
+                    message = strrep(treatment.English, '\n\t', newline + "    ");
                 elseif strcmp(selectedLanguage, 'RO')
-                    message = strrep(treatment, '\n\t', newline + "    ");
+                    message = strrep(treatment.Romanian, '\n\t', newline + "    ");
                 else
                     message = 'Language not supported.';
                 end
@@ -727,10 +731,11 @@ classdef App < matlab.apps.AppBase
             end
 
             % Check if the disease name exists in the map
+            % Check if the disease name exists in the map
             if isKey(treatmentOptions, disease)
                 treatment = treatmentOptions(disease);
             else
-                treatment = 'No treatment options available.';
+                treatment = struct('English', 'No treatment options available.', 'Romanian', 'Tratament indisponibil.');
             end
         end
     end
