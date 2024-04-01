@@ -131,7 +131,7 @@ classdef App < matlab.apps.AppBase
                 if isKey(app.DiseaseNameMapping, char(app.CurrentDiseaseEnglish))
                     app.PredictedPlantLabel.Text = app.DiseaseNameMapping(char(app.CurrentDiseaseEnglish));
                 else
-                    app.PredictedPlantLabel.Text = 'Boală necunoscută'; % Placeholder text for unknown disease
+                    app.PredictedPlantLabel.Text = 'Boală necunoscută.'; % Placeholder text for unknown disease
                 end
             end
         end
@@ -309,6 +309,7 @@ classdef App < matlab.apps.AppBase
             end
 
         end
+
         function DiseaseDetails(app)
             % Check if there is a currently detected disease
             if ~isempty(app.CurrentDiseaseEnglish)
@@ -328,11 +329,23 @@ classdef App < matlab.apps.AppBase
                     message = 'Language not supported.';
                 end
 
-                % Display the details in a message box
-                uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'success');
-            else
-                % If no disease is detected, show a message
-                uialert(app.DiseaseDetectionUIFigure, 'No disease detected.', 'No Disease', 'Icon', 'success');
+                if (message == "Details not available.") || (message == "Detalii indisponibile.")
+
+             % If no disease is detected, show a message
+                    if strcmp(selectedLanguage, 'ENG')
+                        uialert(app.DiseaseDetectionUIFigure, message, 'No disease detected', 'Icon', 'error');
+                    elseif strcmp(selectedLanguage, 'RO')
+                        uialert(app.DiseaseDetectionUIFigure, message, 'Nicio boală detectată.', 'Icon', 'error');
+                    end
+                else
+
+              % Display the details in a message box
+                   if strcmp(selectedLanguage, 'ENG')
+                        uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'success');
+                   elseif strcmp(selectedLanguage, 'RO')
+                        uialert(app.DiseaseDetectionUIFigure, message, 'Detalii Boală', 'Icon', 'success');
+                   end
+               end
             end
         end
 
