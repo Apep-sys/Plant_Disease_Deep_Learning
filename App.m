@@ -16,6 +16,7 @@ classdef App < matlab.apps.AppBase
         ContactButton             matlab.ui.control.Button
         DiseaseNameMapping        containers.Map
         CurrentDiseaseEnglish     string
+        ReturnButton              matlab.ui.control.Button
     end
 
     % Component initialization
@@ -23,80 +24,89 @@ classdef App < matlab.apps.AppBase
     methods (Access = private)
 
     % Create UIFigure and components
-    function createComponents(app)
+        function createComponents(app)
 
-        % Create DiseaseDetectionUIFigure
-        app.DiseaseDetectionUIFigure = uifigure('Name', 'Disease Detection');
-        app.DiseaseDetectionUIFigure.Position = [100 100 800 600]; % Set the figure position
+            % Create DiseaseDetectionUIFigure
+            app.DiseaseDetectionUIFigure = uifigure('Name', 'Disease Detection');
+            app.DiseaseDetectionUIFigure.Position = [100 100 800 600]; % Set the figure position
 
-        % Create BackgroundPanel
-        app.BackgroundPanel = uipanel(app.DiseaseDetectionUIFigure);
-        app.BackgroundPanel.BackgroundColor = [255/255, 228/255, 181/255];
-        app.BackgroundPanel.Position = [1,1,834,604]; % Adjust the panel size
+            % Create BackgroundPanel
+            app.BackgroundPanel = uipanel(app.DiseaseDetectionUIFigure);
+            app.BackgroundPanel.BackgroundColor = [255/255, 228/255, 181/255];
+            app.BackgroundPanel.Position = [1,1,834,604]; % Adjust the panel size
 
-        % Create BackgroundAxes
-        app.BackgroundAxes = uiaxes(app.BackgroundPanel);
-        app.BackgroundAxes.Position = [1,1,834,604]; % Adjust the axes size
-        imshow("D:\Downloads\imaginefundal.jpg", 'Parent', app.BackgroundAxes); % Set background image here
-        app.BackgroundAxes.XTick = [];
-        app.BackgroundAxes.YTick = [];
-        app.BackgroundAxes.Box = 'off';
+            % Create BackgroundAxes
+            app.BackgroundAxes = uiaxes(app.BackgroundPanel);
+            app.BackgroundAxes.Position = [1,1,834,604]; % Adjust the axes size
+            imshow("D:\Downloads\imaginefundal.jpg", 'Parent', app.BackgroundAxes); % Set background image here
+            app.BackgroundAxes.XTick = [];
+            app.BackgroundAxes.YTick = [];
+            app.BackgroundAxes.Box = 'off';
 
-        % Create TextArea
-        app.TextArea = uitextarea(app.DiseaseDetectionUIFigure);
-        app.TextArea.Position = [320 510 160 35]; % Adjust position of TextArea
-        app.TextArea.Value = {'  Choose the picture required for the inspection'};
-        app.TextArea.Editable = false; % Make the text non-editable
+            % Create TextArea
+            app.TextArea = uitextarea(app.DiseaseDetectionUIFigure);
+            app.TextArea.Position = [320 510 160 35]; % Adjust position of TextArea
+            app.TextArea.Value = {'  Choose the picture required for the inspection'};
+            app.TextArea.Editable = false; % Make the text non-editable
 
-        % Create InsertPictureButton
-        app.InsertPictureButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-        app.InsertPictureButton.Position = [320 470 160 35]; % Adjust position of InsertPictureButton
-        app.InsertPictureButton.Text = 'Insert Picture';
-        app.InsertPictureButton.ButtonPushedFcn = @(src, event) insertPictureButtonPushed(app);
+            % Create InsertPictureButton
+            app.InsertPictureButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+            app.InsertPictureButton.Position = [320 470 160 35]; % Adjust position of InsertPictureButton
+            app.InsertPictureButton.Text = 'Insert Picture';
+            app.InsertPictureButton.ButtonPushedFcn = @(src, event) insertPictureButtonPushed(app);
 
-        % Create LanguageSwitch
-        app.LanguageSwitch = uiswitch(app.DiseaseDetectionUIFigure, 'slider');
-        app.LanguageSwitch.Items = {'ENG', 'RO'};
-        app.LanguageSwitch.Position = [50, 510, 50, 22]; % Adjust position of the switch button
-        app.LanguageSwitch.ValueChangedFcn = @(src, event) switchLanguage(app, src, event);
+            % Create LanguageSwitch
+            app.LanguageSwitch = uiswitch(app.DiseaseDetectionUIFigure, 'slider');
+            app.LanguageSwitch.Items = {'ENG', 'RO'};
+            app.LanguageSwitch.Position = [50, 510, 50, 22]; % Adjust position of the switch button
+            app.LanguageSwitch.ValueChangedFcn = @(src, event) switchLanguage(app, src, event);
 
-        % Create PredictedPlantLabel
-        app.PredictedPlantLabel = uilabel(app.DiseaseDetectionUIFigure);
-        app.PredictedPlantLabel.Position = [320 440 400 22]; % Adjust position of PredictedPlantLabel
-        app.PredictedPlantLabel.Text = '';
+            % Create PredictedPlantLabel
+            app.PredictedPlantLabel = uilabel(app.DiseaseDetectionUIFigure);
+            app.PredictedPlantLabel.Position = [320 440 400 22]; % Adjust position of PredictedPlantLabel
+            app.PredictedPlantLabel.Text = '';
 
-        % Create TipLabel
-        app.TipLabel = uilabel(app.DiseaseDetectionUIFigure);
-        app.TipLabel.Text = '';
+            % Create TipLabel
+            app.TipLabel = uilabel(app.DiseaseDetectionUIFigure);
+            app.TipLabel.Text = '';
 
-        % Create DiseaseDetailsButton
-        app.DiseaseDetailsButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-        app.DiseaseDetailsButton.Position = [320, 200, 160, 35]; % Adjust position of DiseaseDetailsButton
-        app.DiseaseDetailsButton.Text = 'Disease Details';
-        app.DiseaseDetailsButton.ButtonPushedFcn = @(src, event) DiseaseDetails(app);
-        app.DiseaseDetailsButton.Visible = 'off'; % Set the button to be visible
+            % Create DiseaseDetailsButton
+            app.DiseaseDetailsButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+            app.DiseaseDetailsButton.Position = [320, 200, 160, 35]; % Adjust position of DiseaseDetailsButton
+            app.DiseaseDetailsButton.Text = 'Disease Details';
+            app.DiseaseDetailsButton.ButtonPushedFcn = @(src, event) DiseaseDetails(app);
+            app.DiseaseDetailsButton.Visible = 'off'; % Set the button to be visible
 
-        % Create TreatmentOptions Button
-        app.TreatmentOptionsButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-        app.TreatmentOptionsButton.Position = [320, 150, 160, 35];
-        app.TreatmentOptionsButton.Text = 'Treatment Options';
-        app.TreatmentOptionsButton.ButtonPushedFcn = @(src, event) TreatmentOptions(app);
-        app.TreatmentOptionsButton.Visible = 'off'; % Set the button to be visible
+            % Create TreatmentOptions Button
+            app.TreatmentOptionsButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+            app.TreatmentOptionsButton.Position = [320, 150, 160, 35];
+            app.TreatmentOptionsButton.Text = 'Treatment Options';
+            app.TreatmentOptionsButton.ButtonPushedFcn = @(src, event) TreatmentOptions(app);
+            app.TreatmentOptionsButton.Visible = 'off'; % Set the button to be visible
         
-        % Create Contact Button
-        app.ContactButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-        app.ContactButton.Position = [320, 100, 160, 35];
-        app.ContactButton.Text = 'Contact Information';
-        app.ContactButton.ButtonPushedFcn = @(src, event) ContactInfo(app);
-        app.ContactButton.Visible = 'off';
+            % Create Contact Button
+            app.ContactButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+            app.ContactButton.Position = [320, 100, 160, 35];
+            app.ContactButton.Text = 'Contact Information';
+            app.ContactButton.ButtonPushedFcn = @(src, event) ContactInfo(app);
+            app.ContactButton.Visible = 'off';
+        
+            % Create BackToFirstPageButton
+            app.ReturnButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+            app.ReturnButton.Icon = fullfile("D:\Downloads\MATLAB Code\Application\images\return-button.png");
+            app.ReturnButton.Text = '';
+            app.ReturnButton.BackgroundColor = [255/255, 228/255, 181/255];
+            app.ReturnButton.Position = [50, 450, 50, 50]; % Adjust position and size
+            app.ReturnButton.ButtonPushedFcn = @(~,~) resetUI(app);
+            app.ReturnButton.Visible = 'off';
 
-        % Show the figure after all components are created
-        app.DiseaseDetectionUIFigure.Visible = 'on';
-    end
+            % Show the figure after all components are created
+            app.DiseaseDetectionUIFigure.Visible = 'on';
+        end
 
 
         % Function to add a border to an image
-        function imgWithBorderPath = addImageBorder(~, imgPath, borderColor, borderWidth)
+         function imgWithBorderPath = addImageBorder(~, imgPath, borderColor, borderWidth)
             img = imread(imgPath);
             % Create a border around the image
             border = uint8(ones(size(img, 1) + 2 * borderWidth, size(img, 2) + 2 * borderWidth, size(img, 3)) * 255);
@@ -110,48 +120,48 @@ classdef App < matlab.apps.AppBase
         end
 
 
-        function updateDiseaseLabelLanguage(app, language)
+         function updateDiseaseLabelLanguage(app, language)
             % Check if the PredictedPlantLabel object exists and is valid
-            if isempty(app.PredictedPlantLabel) || ~isvalid(app.PredictedPlantLabel)
-                % If the label does not exist or is not valid, exit the function
-                return;
-            end
+             if isempty(app.PredictedPlantLabel) || ~isvalid(app.PredictedPlantLabel)
+                 % If the label does not exist or is not valid, exit the function
+                 return;
+             end
     
-            % Now check if CurrentDiseaseEnglish has a valid value
-            if isempty(app.CurrentDiseaseEnglish) || (~ischar(app.CurrentDiseaseEnglish) && ~isstring(app.CurrentDiseaseEnglish))
-                % If there's no disease detected yet or the format is incorrect, exit the function
-                return;
-            end
+             % Now check if CurrentDiseaseEnglish has a valid value
+             if isempty(app.CurrentDiseaseEnglish) || (~ischar(app.CurrentDiseaseEnglish) && ~isstring(app.CurrentDiseaseEnglish))
+                 % If there's no disease detected yet or the format is incorrect, exit the function
+                 return;
+             end
 
-            % Update the label based on the current language setting
-            if language == "ENG"
-                formattedLabel = strrep(app.CurrentDiseaseEnglish, '_', ' ');
-                app.PredictedPlantLabel.Text = formattedLabel;
-            elseif language == "RO"
-                if isKey(app.DiseaseNameMapping, char(app.CurrentDiseaseEnglish))
-                    app.PredictedPlantLabel.Text = app.DiseaseNameMapping(char(app.CurrentDiseaseEnglish));
-                else
-                    app.PredictedPlantLabel.Text = 'Boală necunoscută.'; % Placeholder text for unknown disease
-                end
-            end
-        end
+             % Update the label based on the current language setting
+             if language == "ENG"
+                 formattedLabel = strrep(app.CurrentDiseaseEnglish, '_', ' ');
+                 app.PredictedPlantLabel.Text = formattedLabel;
+             elseif language == "RO"
+                 if isKey(app.DiseaseNameMapping, char(app.CurrentDiseaseEnglish))
+                     app.PredictedPlantLabel.Text = app.DiseaseNameMapping(char(app.CurrentDiseaseEnglish));
+                 else
+                     app.PredictedPlantLabel.Text = 'Boală necunoscută'; % Placeholder text for unknown disease
+                 end
+             end
+         end
 
 
-        function updateToolTipLanguage(app, language)
+         function updateToolTipLanguage(app, language)
     % Check if the TipLabel object exists and is valid
-            if isempty(app.TipLabel) || ~isvalid(app.TipLabel)
-        % If the label does not exist or is not valid, exit the functiontable
-                return;
-            end
-    % Only update the Tool Tip message if there is a valid disease detected
-            if ~isempty(app.CurrentDiseaseEnglish)
-                if language == "ENG"
-                    app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a surface, in normal conditions of visibility. Then, take a picture.';
-                elseif language == "RO"
-                     app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o suprafa, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
-                end
-            end
-        end
+             if isempty(app.TipLabel) || ~isvalid(app.TipLabel)
+         % If the label does not exist or is not valid, exit the functiontable
+                 return;
+             end
+     % Only update the Tool Tip message if there is a valid disease detected
+             if ~isempty(app.CurrentDiseaseEnglish)
+                 if language == "ENG"
+                     app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a surface, in normal conditions of visibility. Then, take a picture.';
+                 elseif language == "RO"
+                      app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o suprafa, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
+                 end
+             end
+         end
 
 
          function insertPictureButtonPushed(app)
@@ -228,6 +238,7 @@ classdef App < matlab.apps.AppBase
                 app.DiseaseDetailsButton.Visible = 'on';
                 app.TreatmentOptionsButton.Visible = 'on';
                 app.ContactButton.Visible = 'on';
+                app.ReturnButton.Visible = 'on';
         
                 % Hide unnecessary components
                 app.TextArea.Visible = 'off';
@@ -236,7 +247,7 @@ classdef App < matlab.apps.AppBase
         end
         
         
-        function switchLanguage(app, src, ~)
+         function switchLanguage(app, src, ~)
             % Get the current value of the switch button
             selectedLanguage = src.Value;
 
@@ -280,7 +291,7 @@ classdef App < matlab.apps.AppBase
         end
     
     
-        function ContactInfo(app)
+         function ContactInfo(app)
             contactInfo = struct(...
                 'English', ["To contact the local authority or a relevant institution, please access the following: ", ...
                 "   ", ...
@@ -309,8 +320,7 @@ classdef App < matlab.apps.AppBase
             end
 
         end
-
-        function DiseaseDetails(app)
+         function DiseaseDetails(app)
             % Check if there is a currently detected disease
             if ~isempty(app.CurrentDiseaseEnglish)
                 % Get the details for the current disease
@@ -339,17 +349,17 @@ classdef App < matlab.apps.AppBase
                     end
                 else
 
-              % Display the details in a message box
-                   if strcmp(selectedLanguage, 'ENG')
-                        uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'success');
-                   elseif strcmp(selectedLanguage, 'RO')
-                        uialert(app.DiseaseDetectionUIFigure, message, 'Detalii Boală', 'Icon', 'success');
-                   end
-               end
-            end
-        end
+                     % Display the details in a message box
+                    if strcmp(selectedLanguage, 'ENG')
+                         uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'success');
+                    elseif strcmp(selectedLanguage, 'RO')
+                         uialert(app.DiseaseDetectionUIFigure, message, 'Detalii Boală', 'Icon', 'success');
+                    end
+                end
+             end
+         end
 
-        function details = getDiseaseDetails(app, disease)
+         function details = getDiseaseDetails(app, disease)
             % Define disease details based on the disease name
             keys = {'Pepper__bell___Bacterial_spot',...
                     'Pepper__bell___healthy',...
@@ -513,8 +523,7 @@ classdef App < matlab.apps.AppBase
             end
         end
  
-
-        function TreatmentOptions(app)
+         function TreatmentOptions(app)
             if ~isempty(app.CurrentDiseaseEnglish)
                 % Get the details for the current disease
                 disease = app.CurrentDiseaseEnglish; % Assuming this is the disease name
@@ -531,17 +540,26 @@ classdef App < matlab.apps.AppBase
                 else
                     message = 'Language not supported.';
                 end
+                
+                if (message == "Treatment not available.") || (message == "Tratament indisponibil.")
+                    if strcmp(selectedLanguage, 'ENG')
+                        uialert(app.DiseaseDetectionUIFigure, message, 'No disease detected', 'Icon', 'error');
+                    elseif strcmp(selectedLanguage, 'RO')
+                        uialert(app.DiseaseDetectionUIFigure, message, 'Nicio boală detectată.', 'Icon', 'error');
+                    end
+                else
 
-                % Display the details in a message box
-                uialert(app.DiseaseDetectionUIFigure, message, 'Treatment Options', 'Icon', 'success');
-            else
-                % If no disease is detected, show a message
-                uialert(app.DiseaseDetectionUIFigure, 'No disease detected.', 'No Disease', 'Icon', 'success');
+                     % Display the details in a message box
+                    if strcmp(selectedLanguage, 'ENG')
+                         uialert(app.DiseaseDetectionUIFigure, message, 'Disease Details', 'Icon', 'success');
+                    elseif strcmp(selectedLanguage, 'RO')
+                         uialert(app.DiseaseDetectionUIFigure, message, 'Detalii Boală', 'Icon', 'success');
+                    end
+                end
             end
         end
 
-
-        function treatment = getTreatmentOptions(app, disease)
+         function treatment = getTreatmentOptions(app, disease)
             keys_Treatment = {'Pepper__bell___Bacterial_spot', ...
                     'Pepper__bell___healthy', ...
                     'Potato___Early_blight', ...
@@ -792,6 +810,30 @@ classdef App < matlab.apps.AppBase
                 treatment = defaultTreatment;
             end
         end
+
+         function resetUI(app)
+             % Clear the current axes
+             cla(app.BackgroundAxes);
+             imshow("D:\Downloads\imaginefundal.jpg", 'Parent', app.BackgroundAxes);
+
+             % Reset the UI to its initial state
+             app.TextArea.Visible = 'on';
+             app.InsertPictureButton.Visible = 'on';
+             app.DiseaseDetailsButton.Visible = 'off';
+             app.TreatmentOptionsButton.Visible = 'off';
+             app.ContactButton.Visible = 'off';
+             app.ReturnButton.Visible = 'off';
+             % Reset the inserted image
+             app.InsertedImage.ImageSource = '';
+             app.InsertedImage.Visible = 'off';
+
+             % Reset the disease labels and tooltips
+             app.PredictedPlantLabel.Text = '';
+             app.PredictedPlantLabel.Visible = 'off';
+             app.TipLabel.Text = '';
+             app.TipLabel.Visible = 'off';
+         end
+         
     end
 
 
