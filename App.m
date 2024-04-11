@@ -48,10 +48,13 @@ classdef App < matlab.apps.AppBase
             app.TextArea.Position = [320 510 160 35]; % Adjust position of TextArea
             app.TextArea.Value = {'  Choose the picture required for the inspection'};
             app.TextArea.Editable = false; % Make the text non-editable
+            app.TextArea.FontColor = [0, 0, 204/255];
+            app.TextArea.HorizontalAlignment = 'center';
 
             % Create InsertPictureButton
             app.InsertPictureButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
             app.InsertPictureButton.Position = [320 470 160 35]; % Adjust position of InsertPictureButton
+            app.InsertPictureButton.FontWeight = 'bold';
             app.InsertPictureButton.Text = 'Insert Picture';
             app.InsertPictureButton.ButtonPushedFcn = @(src, event) insertPictureButtonPushed(app);
 
@@ -59,11 +62,13 @@ classdef App < matlab.apps.AppBase
             app.LanguageSwitch = uiswitch(app.DiseaseDetectionUIFigure, 'slider');
             app.LanguageSwitch.Items = {'ENG', 'RO'};
             app.LanguageSwitch.Position = [50, 510, 50, 22]; % Adjust position of the switch button
+            app.LanguageSwitch.FontWeight = 'bold';
             app.LanguageSwitch.ValueChangedFcn = @(src, event) switchLanguage(app, src, event);
 
             % Create PredictedPlantLabel
             app.PredictedPlantLabel = uilabel(app.DiseaseDetectionUIFigure);
             app.PredictedPlantLabel.Position = [320 440 400 22]; % Adjust position of PredictedPlantLabel
+            app.PredictedPlantLabel.FontWeight = 'bold';
             app.PredictedPlantLabel.Text = '';
 
             % Create TipLabel
@@ -76,6 +81,7 @@ classdef App < matlab.apps.AppBase
             app.DiseaseDetailsButton.Text = 'Disease Details';
             app.DiseaseDetailsButton.ButtonPushedFcn = @(src, event) DiseaseDetails(app);
             app.DiseaseDetailsButton.Visible = 'off'; % Set the button to be visible
+            
 
             % Create TreatmentOptions Button
             app.TreatmentOptionsButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
@@ -157,8 +163,10 @@ classdef App < matlab.apps.AppBase
              if ~isempty(app.CurrentDiseaseEnglish)
                  if language == "ENG"
                      app.TipLabel.Text = 'Tip: For better accuracy, cut off the leaf of the diseased plant and put it on a surface, in normal conditions of visibility. Then, take a picture.';
+                     %app.TipLabel.FontWeight = 'bold';
                  elseif language == "RO"
                       app.TipLabel.Text = 'Sfat: Pentru o acuratețe mai bună, tăiați frunza plantei bolnave și pune-ți-o pe o suprafață, în condiții normale de vizibilitate. Apoi, faceți-i poză.';
+                      %app.TipLabel.FontWeight = 'bold';
                  end
              end
          end
@@ -239,6 +247,11 @@ classdef App < matlab.apps.AppBase
                 app.TreatmentOptionsButton.Visible = 'on';
                 app.ContactButton.Visible = 'on';
                 app.ReturnButton.Visible = 'on';
+                
+                app.DiseaseDetailsButton.FontWeight = 'bold';
+                app.TreatmentOptionsButton.FontWeight = 'bold';
+                app.ContactButton.FontWeight = 'bold';
+                
         
                 % Hide unnecessary components
                 app.TextArea.Visible = 'off';
