@@ -17,13 +17,14 @@ classdef App < matlab.apps.AppBase
         DiseaseNameMapping        containers.Map
         CurrentDiseaseEnglish     string
         ReturnButton              matlab.ui.control.Button
+        webcamObj                 % Webcam obiect ca si prop
+        TakeScreenshotButton      matlab.ui.control.Button
     end
 
-    % Component initialization
-    % Component initialization
+    %Initializare
     methods (Access = private)
 
-    % Create UIFigure and components
+    % UIFigure si componente
         function createComponents(app)
 
             % Create DiseaseDetectionUIFigure
@@ -38,7 +39,7 @@ classdef App < matlab.apps.AppBase
             % Create BackgroundAxes
             app.BackgroundAxes = uiaxes(app.BackgroundPanel);
             app.BackgroundAxes.Position = [1,1,834,604]; % Adjust the axes size
-            imshow("D:\Downloads\imaginefundal.jpg", 'Parent', app.BackgroundAxes); % Set background image here
+            imshow('D:\Downloads\imaginefundal.jpg', 'Parent', app.BackgroundAxes); % Set background image here
             app.BackgroundAxes.XTick = [];
             app.BackgroundAxes.YTick = [];
             app.BackgroundAxes.Box = 'off';
@@ -90,29 +91,39 @@ classdef App < matlab.apps.AppBase
             app.TreatmentOptionsButton.ButtonPushedFcn = @(src, event) TreatmentOptions(app);
             app.TreatmentOptionsButton.Visible = 'off'; % Set the button to be visible
         
-            % Create Contact Button
+            %Contact Button
             app.ContactButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
             app.ContactButton.Position = [320, 100, 160, 35];
             app.ContactButton.Text = 'Contact Information';
             app.ContactButton.ButtonPushedFcn = @(src, event) ContactInfo(app);
             app.ContactButton.Visible = 'off';
         
-            % Create BackToFirstPageButton
+            %Return Button
             app.ReturnButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
-            app.ReturnButton.Icon = fullfile("D:\Downloads\MATLAB Code\Application\images\return-button.png");
+            app.ReturnButton.Icon = fullfile('D:\Downloads\MATLAB Code\Application\images\return-button.png');
             app.ReturnButton.Text = '';
             app.ReturnButton.BackgroundColor = [255/255, 228/255, 181/255];
             app.ReturnButton.Position = [50, 450, 50, 50]; % Adjust position and size
             app.ReturnButton.ButtonPushedFcn = @(~,~) resetUI(app);
             app.ReturnButton.Visible = 'off';
+    
+            %Buton 2 Ecran Principal
+            app.TakeScreenshotButton = uibutton(app.DiseaseDetectionUIFigure, 'push');
+            app.TakeScreenshotButton.Position = [320 430 160 35]; % Adjust position of TakeScreenshotButton
+            app.TakeScreenshotButton.Text = 'Take Screenshot';
+            app.TakeScreenshotButton.ButtonPushedFcn = @(src, event) takeScreenshotButtonPushed(app);  % Define the button callback
+            app.TakeScreenshotButton.FontWeight = 'bold';
+            
+            app.webcamObj = ipcam('http://192.168.4.1:81/stream');
+            preview(app.webcamObj);
 
-            % Show the figure after all components are created
+            %Crearea GUI
             app.DiseaseDetectionUIFigure.Visible = 'on';
         end
 
 
         % Function to add a border to an image
-         function imgWithBorderPath = addImageBorder(~, imgPath, borderColor, borderWidth)
+         function imgWithBorderPath = addImageBorder(~, img1, borderColor, borderWidth)
             img = imread(imgPath);
             % Create a border around the image
             border = uint8(ones(size(img, 1) + 2 * borderWidth, size(img, 2) + 2 * borderWidth, size(img, 3)) * 255);
@@ -171,6 +182,89 @@ classdef App < matlab.apps.AppBase
              end
          end
 
+         function takeScreenshotButtonPushed(app)
+           
+
+            % Capture image from webcam
+            img = snapshot(app.webcamObj);
+
+            imwrite(img, 'snapshot_image.jpg');
+        
+            % Read the saved image
+            img1 = imread('snapshot_image.jpg');
+        
+            % Clear the previous background image
+            cla(app.BackgroundAxes); % Clear the current axes
+            app.BackgroundAxes.Visible = 'on';
+            app.BackgroundAxes.Color = [255/255, 228/255, 181/255];
+            app.BackgroundAxes.Box = 'off';
+            app.BackgroundAxes.XColor = 'none';
+            app.BackgroundAxes.YColor = 'none'; 
+            app.BackgroundAxes.XTick = [];
+            app.BackgroundAxes.YTick = [];
+        
+            % Load pre-trained GoogLeNet
+            net1 = googlenet;
+            targetSize = net1.Layers(1).InputSize;
+        
+            % Resize the captured image to match the input size of the model
+            resizedImage = imresize(img1, targetSize(1:2));
+        
+            % Load your models
+            load('plant_disease_model.mat', 'convnet');
+        
+            % Classify the image with the models
+            [predictedLabel1, scores1] = classify(convnet, resizedImage);
+        
+            % Set confidence threshold for plant disease classification
+            confidenceThreshold = 0.79; % Adjust as needed
+        
+            % Check if the highest confidence score from either model is above the threshold
+            if max(scores1) >= confidenceThreshold 
+                disp(['Predicted label using Model 1: ' char(predictedLabel1)]);
+            else
+                disp('The provided image is not recognized as a plant disease.');
+            end
+        
+            disp('Max score for Model 1:');
+            disp(max(scores1));
+        
+            % Add a green border to the image
+            imgWithBorder = app.addImageBorder(resizedImage, [0, 155, 0], 10);
+            app.InsertedImage = uiimage(app.DiseaseDetectionUIFigure);
+            app.InsertedImage.ImageSource = imgWithBorder;
+            imgWidth = size(resizedImage, 2);
+            imgHeight = size(resizedImage, 1);
+            app.InsertedImage.Position = [(app.DiseaseDetectionUIFigure.Position(3) - imgWidth) / 2, (app.DiseaseDetectionUIFigure.Position(4) - imgHeight) / 2 + 170, imgWidth, imgHeight]; % Adjust position and size of the inserted image to account for the border
+
+            % Display the image with border
+            %imshow(imgWithBorder, 'Parent', app.BackgroundAxes);
+        
+            % Update the text with the predicted plant label and the tool tip
+            app.PredictedPlantLabel = uilabel(app.DiseaseDetectionUIFigure);
+            app.PredictedPlantLabel.Position = [app.InsertedImage.Position(1) + 30, app.InsertedImage.Position(2) - 30, 400, 22];
+            if max(scores1) >= confidenceThreshold 
+                app.CurrentDiseaseEnglish = char(predictedLabel1);
+                updateDiseaseLabelLanguage(app, app.LanguageSwitch.Value);
+        
+                %app.TipLabel.Text = 'Your diagnosis tooltip here...';
+            else
+                app.CurrentDiseaseEnglish = 'No disease detected.';
+                updateDiseaseLabelLanguage(app, app.LanguageSwitch.Value);
+                app.TipLabel.Text = '';
+            end
+        
+            % Make the Disease Details Button visible after picture is classified
+            app.DiseaseDetailsButton.Visible = 'on';
+            app.TreatmentOptionsButton.Visible = 'on';
+            app.ContactButton.Visible = 'on';
+            app.ReturnButton.Visible = 'on';
+        
+            % Hide unnecessary components
+            app.TextArea.Visible = 'off';
+            app.InsertPictureButton.Visible = 'off';
+            app.TakeScreenshotButton.Visible = 'off';
+         end
 
          function insertPictureButtonPushed(app)
             % Open file explorer to select an image
@@ -256,8 +350,9 @@ classdef App < matlab.apps.AppBase
                 % Hide unnecessary components
                 app.TextArea.Visible = 'off';
                 app.InsertPictureButton.Visible = 'off';
+                app.TakeScreenshotButton.Visible = 'off';
             end
-        end
+         end
         
         
          function switchLanguage(app, src, ~)
@@ -268,6 +363,7 @@ classdef App < matlab.apps.AppBase
             if strcmp(selectedLanguage, 'ENG')
                 app.TextArea.Value = {'  Choose the picture required for the inspection'};
                 app.InsertPictureButton.Text = 'Insert Picture';
+                app.TakeScreenshotButton.Text = 'Take Screenshot';
                 app.DiseaseDetailsButton.Text = 'Disease Details';
                 app.TreatmentOptionsButton.Text = 'Treatment Options';
                 app.ContactButton.Text = 'Contact Information';
@@ -284,6 +380,7 @@ classdef App < matlab.apps.AppBase
             elseif strcmp(selectedLanguage, 'RO')
                 app.TextArea.Value = {'  Alegeți imaginea necesară pentru inspecție'};
                 app.InsertPictureButton.Text = 'Inserați imaginea';
+                app.TakeScreenshotButton.Text = 'Faceti poza acum';
                 app.DiseaseDetailsButton.Text = 'Detalii Boală';
                 app.TreatmentOptionsButton.Text = 'Opțiuni de Tratament';
                 app.ContactButton.Text = 'Informații de Contact';
@@ -827,17 +924,21 @@ classdef App < matlab.apps.AppBase
          function resetUI(app)
              % Clear the current axes
              cla(app.BackgroundAxes);
-             imshow("D:\Downloads\imaginefundal.jpg", 'Parent', app.BackgroundAxes);
+             imshow('C:\Users\alexb\Desktop\imaginefundal.jpg', 'Parent', app.BackgroundAxes);
 
              % Reset the UI to its initial state
              app.TextArea.Visible = 'on';
              app.InsertPictureButton.Visible = 'on';
+             app.TakeScreenshotButton.Visible = 'on';
              app.DiseaseDetailsButton.Visible = 'off';
              app.TreatmentOptionsButton.Visible = 'off';
              app.ContactButton.Visible = 'off';
              app.ReturnButton.Visible = 'off';
              % Reset the inserted image
-             app.InsertedImage.ImageSource = '';
+             %app.InsertedImage.ImageSource = '';
+             if isempty(app.InsertedImage)
+                app.InsertedImage = matlab.ui.control.Image();
+             end
              app.InsertedImage.Visible = 'off';
 
              % Reset the disease labels and tooltips
